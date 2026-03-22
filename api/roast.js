@@ -33,11 +33,15 @@ export default async function handler(req, res) {
     const result = await model.generateContent(prompt);
     const roastedText = await result.response.text();
 
-    // 4. Save to database
-    await supabase.from('roasts').insert([
-      { original_text: text, roasted_text: roastedText }
-    ]);
+// 4. Save to database AND check for errors
+const { error: dbError } = await supabase.from('roasts').insert([
+  { original_text: text, roasted_text: roastedText }
+]);
 
+// If Supabase gets mad, print it to the Vercel logs so we can see it
+if (dbError) {
+  console.error("Supabase Save Error:", dbError.message);
+}
     // 5. Send success response
     return res.status(200).json({ roast: roastedText });
 

@@ -2,6 +2,16 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createClient } from '@supabase/supabase-js';
 
 export default async function handler(req, res) {
+  // 1. The CORS Secret Handshake (Allows your Chrome Extension to connect)
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Allows any website to connect
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // If the browser is just doing a pre-flight security check, say "All good!" and stop here
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
